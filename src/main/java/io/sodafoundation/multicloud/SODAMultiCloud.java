@@ -82,6 +82,7 @@ public class SODAMultiCloud {
         Response response = httpClient.newCall(httpRequest).execute();
 
         System.out.println("Listing Buckets\n");
+        System.out.println(response.code());
             // Get response body
         System.out.println(response.body().string());
 
@@ -107,6 +108,7 @@ public class SODAMultiCloud {
         Response response = httpClient.newCall(httpRequest).execute();
 
         System.out.println("Getting Bucket\n");
+        System.out.println(response.code());
         // Get response body
         System.out.println(response.body().string());
 
