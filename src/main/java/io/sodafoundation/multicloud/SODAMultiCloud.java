@@ -34,7 +34,7 @@ public class SODAMultiCloud {
         String date = getDate();
         listBucket(host, "/", region, date);
         getBucket(host, "/", region, date, bucket);
-
+        listBucketSODASignature(host, "/", region, date);
     }
 
     public static String getDate() {
@@ -62,13 +62,39 @@ public class SODAMultiCloud {
         return signature;
     }
 
+    public static void listBucketSODASignature(String host, String endPoint, String region,
+                                  String date) throws URISyntaxException, IOException {
+        String uri = "http://" + host + endPoint;
+
+        System.out.println("Getting Version 4 Signature\n");
+        String signature = SODASigner.getSignature(uri, host, accessKey, secretKey, region, date, CONTENT_SHA_256);
+
+        System.out.println(signature);
+
+        Request httpRequest = new Request.Builder()
+                .url(uri)
+                .header("Host", host)
+                .header("X-Amz-Date", date)
+                .header("X-Amz-Content-Sha256", CONTENT_SHA_256)
+                .header("Authorization", signature)
+                .build();
+
+        Response response = httpClient.newCall(httpRequest).execute();
+
+        System.out.println("Listing Buckets\n");
+        System.out.println(response.code());
+        // Get response body
+        System.out.println(response.body().string());
+
+    }
+
     public static void listBucket(String host, String endPoint, String region,
                                   String date) throws URISyntaxException, IOException {
         String uri = "http://" + host + endPoint;
 
+        System.out.println("Getting Version 4 Signature\n");
         String signature = getSignature(uri, "GET", host, region ,CONTENT_SHA_256);
 
-        System.out.println("Getting Version 4 Signature\n");
         System.out.println(signature);
 
         Request httpRequest = new Request.Builder()
@@ -89,7 +115,7 @@ public class SODAMultiCloud {
     }
 
     public static void getBucket(String host, String endPoint, String region, String date,
-                                 String bucket) throws URISyntaxException, IOException {
+                                  String bucket) throws URISyntaxException, IOException {
         String uri = "http://" + host + endPoint + bucket;
 
         String signature = getSignature(uri, "GET", host, region ,CONTENT_SHA_256);
